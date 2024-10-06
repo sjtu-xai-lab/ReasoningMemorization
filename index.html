@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNN Research Paper</title>
+    <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="./static/css/index.css">
+    <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="./static/css/bulma.min.css">
+
+
+    <script src="static/js/fontawesome.all.min.js"></script>
+    <script src="static/js/bulma-carousel.js"></script>
+    <script src="static/js/bulma-slider.js"></script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
+
+</head>
+
+<body>
+<header>
+    <h1 class="title is-1 publication-title has-text-centered">Quantifying in-Context Reasoning Effects and Memorization Effects in LLMs</h1>
+    <p>
+        <a class="team-member" href="www.JunpengZhang.com">Siyu Lou<sup>1</sup></a>,
+        <a class="team-member" href="www.QingLi.com">Yuntian Chen<sup>2</sup></a>,
+        <a class="team-member" href="www.LiangLin.com">Xiaodan Liang<sup>3</sup></a>,
+        <a class="team-member" href="www.QuanshiZhang.com">Liang Lin<sup>3</sup></a>
+        <a class="team-member" href="www.QuanshiZhang.com">and Quanshi Zhang<sup>1</sup></a>
+    </p>
+    <p><a class="team-member" href="#"><sup>1</sup>Shanghai Jiao Tong University </a>
+        <br><a class="team-member" href="#"><sup>2</sup> Eastern Institute of Technology, Ningbo</a>
+        <br><a class="team-member" href="#"> <sup>3</sup> Sun Yat-Sen University</a>
+    </p>
+    <br>
+    <p>arXiv preprint arXiv:2405.11880. 2024</p>
+</header>
+
+<div class="container">
+
+    <h2>Abstract</h2>
+    <div class="content has-text-justified">
+        <p>It is a long-standing issue whether a large language model (LLM) conducts inference based on both memorized knowledge and reasoning logic. Most existing studies are limited to end-to-end black-box training and testing, which lacks a detailed understanding of LLMs’ inference logic. To this end, in this work,</p>
+        <p>
+            <span>（1）</span> We propose a new axiomatic system to <span>formulate and quantify the exact reasoning effects and memorization effects</span> in mathematics used by an LLM.  <span>The axiomatic system</span> enables a straightforward examination of detailed inference patterns encoded by LLMs.
+        </p>
+        <p>
+            <span>（2）</span> Based on the axiomatic system, the memorization effects can be further divided into <span>foundational memorization effects</span> and <span>chaotic memorization effect</span>, and the reasoning effects can be further categorized into <span>enhanced reasoning patterns, eliminated reasoning patterns</span>, and <span>reversed reasoning patterns</span>. This allows for a more granular analysis of how LLMs apply reasoning in conjunction with the memorized knowledge.
+
+        </p>
+
+        <img src="static/img/2/figure1.png" alt="">
+
+        <div class="latex img-title">
+            Figure 1: (a) The language generation logic of an LLM $v(x_(n+1)|\mathbf{x})$ is proven equivalent to a surrogate logic model $f(x)$ based on interactions on all $2^n$ randomly masked prompts. Each interaction represents an AND/OR relationship encoded by the LLM, which contributes $I(S)$ to the output score $v(x_(n+1)|\mathbf{x})$. (b) An LLM usually encodes a small number of salient interactions. We show strength of all interactions by sorting interaction strength in a descending order. (c) In this study, we decompose all interaction effects into foundational memorization effects, chaotic memorization effects, enhanced reasoning patterns, eliminated reasoning patterns and reversed reasoning patterns.
+        </div>
+
+    </div>
+
+    <hr>
+
+    <h2>Preliminaries: interactions</h2>
+    <div class="content has-text-justified">
+        <div class="latex">
+            Given an input prompt $x$, the confidence score $v(x_(n+1)|\mathbf{x})$ of an LLM can be disentangled into tens/hundreds of inference patterns. An inference pattern $I(S|\mathbf{x})$ is formulated as an interaction to present a non-linear relationship between different input tokens/words. As shown in Figure 2(a), two words {speed, information} form an interaction, making an interaction effect on the network’s output, and the interaction effect increases the confidence score $v(x_(n+1)|\mathbf{x})$ of predicting the next token $x_{n+1}=\text{light}$.
+            We have proven that an LLM can be considered to equivalently encode a set of AND interaction $\Omega_{\text{and}}$ and a set of OR interaction $\Omega_{\text{or}}$, and the confidence score $v(x_(n+1)|\mathbf{x})$ can be decomposed into the numerical effects of these interactions, i.e.,
+
+            $$
+            v(x_{n+1}|\mathbf{x}) = \sum\nolimits_{S\in \Omega_{\text{\rm and}}}I_{\text{\rm and}}(S|\mathbf{x}) +  \sum\nolimits_{S\in \Omega_{\text{\rm or}}}I_{\text{\rm or}}(S|\mathbf{x}) +v(\mathbf{x}_\emptyset),
+            $$
+        </div>
+
+    </div>
+
+
+    <hr>
+    <h2>
+        Axiomatic system
+    </h2>
+    <div class="content ">
+
+        <div class="latex">
+            <span style="font-weight: bold !important;">
+            Context-agnostic memorization vs. in-context reasoning.
+        </span>Let us be given the prompt $\mathbf{x}=[\mathbf{x}_p^T,\mathbf{x}_q^T]^T$, which consists of a premise $\mathbf{x}_p=\{\text{ Caren works at school as a teacher.}\}$ and a question $\mathbf{x}_q=\{\text{ Emily is the colleague of Caren. Emily works as a }\}$. The question can only be answered by incorporating the in-context reasoning with the premise $\mathbf{x}_p$. Thus, the answer generated without the premise only uses the context-agnostic memorization, and the answer generated given both the premise and question is believed to use both memorization and in-context reasoning.
+            We propose an axiomatic system to precisely define and quantify the effects of context-agnostic memorization $(\mathcal{J}_{\text{and}}(S|\mathbf{{x}},\mathcal{J}_{\text{or}(S|\mathbf{x})}$ and in-context reasoning $(\mathcal{K}_{\text{and}}(S|\mathbf{{x}},\mathcal{K}_{\text{or}(S|\mathbf{x})}$ in the LLM’s inference logic, i.e.,
+
+            \begin{subequations}
+            \begin{gather}
+            I_{\text{\rm and}}(S|\mathbf{x}) \overset{\mathrm{decompose}}{=} \mathcal{J}_{\text{\rm and}}(S|\mathbf{x}) + \mathcal{K}_{\text{\rm and}}(S|\mathbf{x}), ~~~~~~ I_{\text{\rm or}}(S|\mathbf{x}) \overset{\mathrm{decompose}}{=} \mathcal{J}_{\text{\rm or}}(S|\mathbf{x}) + \mathcal{K}_{\text{\rm or}}(S|\mathbf{x}), \\
+            \Rightarrow v(x_{n+1}|\mathbf{x})
+            =  \!\!\!\!\underbrace{\!\!\!\!\!\sum_{S\in \Omega_{\text{\rm and}}(\mathbf{x})}\!\!\!\!\!\mathcal{J}_{\text{\rm and}}(S|\mathbf{x})
+            +\!\!\!\!\!\!\!\sum_{S\in \Omega_{\text{\rm or}}(\mathbf{x})}\!\!\!\!\!\mathcal{J}_{\text{\rm or}}(S|\mathbf{x})}_\text{inference effects based on memorization}
+            +\!\!\!\! \underbrace{\!\!\!\!\!\sum_{S\in \Omega_{\text{\rm and}}(\mathbf{x})}\!\!\!\!\!\mathcal{K}_{\text{\rm and}}(S|\mathbf{x})
+            + \!\!\!\!\!\!\sum_{S\in \Omega_{\text{\rm or}}(\mathbf{x})}\!\!\!\!\!\mathcal{K}_{\text{\rm or}}(S|\mathbf{x})} _\text{inference effects based on reasoning}+v(x_{n+1}|\mathbf{x}_\emptyset).
+            \end{gather}
+            \end{subequations}
+        </div>
+
+
+        <div class="latex">
+            <span style="font-weight: bold !important;">Axiom 1</span>(Condition dependence). In-context reasoning effects are supposed to exclusively affect the confidence score with the premise, i.e., if $\mathbf{x}=\mathbf{x}_q$, then $\mathcal{K}_{\text{\rm and}}(S|\mathbf{x}=\mathbf{x}_q)=0$ and $\mathcal{K}_{\text{\rm or}}(S|\mathbf{x}=\mathbf{x}_q)=0$.
+
+        </div>
+        <br>
+
+        <p>
+            <span style="font-weight: bold !important;">Axiom 2</span>(Variable independence).Given a set of logically equivalent prompts, <span class="latex">$\mathbb{X} = \{\mathbf{x}^1, \mathbf{x}^2,\dots, \mathbf{x}^k\}$, let $v(x_{n+1}|\mathbb{X}) = \mathbb{E}_i[v(x_{n+1}|\mathbf{x}^i) ]$ </span>represent the average confidence score. Then, the
+            change of confidence scores \emph{w.r.t.} $v(x_{n+1}|\mathbf{x})$ and $v(x_{n+1}|\mathbb{X})$ are supposed to be exclusively caused by chaotic memorization effects as follows,
+        </p>
+        <div class="latex">
+            $$
+            v(x_{n+1}|\mathbf{x}) - v(x_{n+1}|\mathbb{X})
+            =\sum\nolimits_{S\in \Omega_{\text{\rm and}}(\mathbf{x})}\mathcal{J}^{\text{\rm c}}_{\text{\rm and}}(S|\mathbf{x}) + \sum\nolimits_{S\in \Omega_{\text{\rm or}}(\mathbf{x})}\mathcal{J}^{\text{\rm c}}_{\text{\rm or}}(S|\mathbf{x}).
+            $$
+        </div>
+        <div class="latex">
+            All logically equivalent prompts in $\mathbb{X}$ have the same foundational memorization effects and the in-context reasoning effects, \emph{i.e.},
+            $\forall \mathbf{x}^i, \mathbf{x}^j$ in $\mathbb{X}, \mathcal{J}^{\text{\rm f}}_{\text{\rm and}}(S|\mathbf{x}^i) = \mathcal{J}^{\text{\rm f}}_{\text{\rm and}}(S|\mathbf{x}^j), \mathcal{K}_{\text{\rm and}}(S|\mathbf{x}^i) = \mathcal{K}_{\text{\rm and}}(S|\mathbf{x}^j)$ and $\mathcal{J}^{\text{\rm f}}_{\text{\rm or}}(S|\mathbf{x}^i) = \mathcal{J}^{\text{\rm f}}_{\text{\rm or}}(S|\mathbf{x}^j), \mathcal{K}_{\text{\rm or}}(S|\mathbf{x}^i) = \mathcal{K}_{\text{\rm or}}(S|\mathbf{x}^j)$.
+        </div>
+
+    </div>
+
+    <hr>
+
+    <h2>Fine-grain analysis of memorization effects and in-context reasoning effects</h2>
+    <div class="content has-text-justified">
+        <p>According to the Axioms 1 and 2, we can quantify the memorization effect and the reasoning effect as follows,</p>
+        <div class="latex">
+            \begin{subequations}
+            \begin{align}
+            \mathcal{J}^{\text{\rm f}}_{\text{\rm and}}(S|\mathbf{x}) &= I_{\text{\rm and}}(S|\mathbf{x}_q), &\quad \mathcal{J}^{\text{\rm f}}_{\text{\rm or}}(S|\mathbf{x}) &= I_{\text{\rm or}}(S|\mathbf{x}_q),\\
+            \mathcal{J}^{\text{\rm c}}_{\text{\rm and}}(S|\mathbf{x}) &= I_{\text{\rm and}}(S|\mathbf{x}) - I_{\text{\rm and}}(S|\mathbb{X}), &
+            \quad \mathcal{J}^{\text{\rm c}}_{\text{\rm or}}(S|\mathbf{x}) &= I_{\text{\rm or}}(S|\mathbf{x})-I_{\text{\rm or}}(S|\mathbb{X}), \\
+            \mathcal{K}_{\text{\rm and}}(S|\mathbf{x}) &= I_{\text{\rm and}}(S|\mathbb{X}) - I_{\text{\rm and}}(S|\mathbf{x}_q), &
+            \quad \mathcal{K}_{\text{\rm or}}(S|\mathbf{x}) &= I_{\text{\rm or}}(S|\mathbb{X}) - I_{\text{\rm or}}(S|\mathbf{x}_q),
+            \end{align}
+            \end{subequations}
+        </div>
+        <p>
+            <span>The above decomposed effects still satisfy the sparsity property and the universal matching property, hence providing theoretical guarantee of the faithfulness.</span> The axiomatic system was tested on three LLMs: OPT-1.3b, LLaMA-7B, and GPT-3.5-Turbo. Some key insights are as follow.
+        </p>
+        <br>
+        <p>
+            <span>1.All tested LLM models encoded substantial in-context reasoning effects in inference and relatively weak chaotic memorization effects.</span>
+            <br>
+            As shown in Table 1. The high ratio of reasoning effects and low ratio of chaotic memorization effects indicated the relatively good representation quality of the LLM.
+        </p>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th></th>
+                <th>OPT-1.3B</th>
+                <th>LLaMA-7B</th>
+                <th>GPT-3.5-Turbo</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><div class="latex">$\rho_r$</div></td>
+                <td>39.12%</td>
+                <td>42.82%</td>
+                <td style="font-weight: bold">45.24%</td>
+            </tr>
+            <tr>
+                <td><div class="latex">$\rho_c$</div></td>
+                <td style="font-weight: bold">7.37%</td>
+                <td>7.57%</td>
+                <td>7.81%</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p class="img-title"><div class="latex">Table 1: The ratio of in-context reasoning effects $\rho_r$ and the ratio of chaotic memorization effects $\rho_c$</div> </p>
+        <br>
+
+        <p>
+            <span>2.Memorization effects contained interactions of varying orders,</span> as shown in Figure
+        </p>
+        <p>
+            2.
+        </p>
+        <p>
+            <div class="latex">Here, we use the order of the interaction to represent the number of input words in $S$, i.e., $order(S)=|S|$High-order interactions have lower generalization power than low-order interactions.</div>
+        </p>
+
+        <img src="static/img/2/figure2.png" alt="">
+        <p class="img-title">Figure 2: Distribution of the strength of foundational memorization interactions, chaotic memorization interactions and in-context reasoning interactions by order m.</p>
+
+        <p>
+            <span>3.In-context reasoning effects tend to eliminate high-order interactions and amplify low-order interactions in memorization effects.</span>
+        </p>
+
+        <img src="static/img/2/figure3.png" alt="">
+        <p class="img-title">Figure 3: (a) Distribution of the strength of three types of in-context reasoning effects over different orders $m$. (b) Visualization of some in-context reasoning effects and memorization effects on a single sample extracted from the LLaMA-7B model.</p>
+
+
+        <br>
+        <p>
+            As shown in Figure 3. We can consider that the LLM uses the premise to filter out irrelevant memorization effects. Meanwhile, the reasoning effects also enhanced/reverse a small number of low-order interactions to refine the inference logic. Because high-order interactions have been found less generalizable than low-order interactions, the addition of the premise makes the inference much clearer and more faithful.
+        </p>
+
+
+    </div>
+
+    <hr>
+
+    <h2>Practical value</h2>
+    <div class="content has-text-justified">
+        <p>
+           <span> 1.Identifying seemingly correct yet actually incorrect inference logic.</span>1.If we only evaluate the LLM based on its outputs, the superior performance of the LLM has led to a misconception that the LLM has already modeled reliable knowledge or conducted inference based on correct logic. However, our method first has enabled us to quantify the exact inference patterns of different types, and experiments have then shown that many inference patterns represent incorrect logic.
+        </p>
+        <p>
+            <span>2.Enabling semantic debugging.</span>2.Unlike traditional engineering explanation techniques, our method with theoretical guarantees (i.e., the universal-matching property) can guide the construction of adversarial prompts to attack LLMs.
+        </p>
+
+        <img src="static/img/2/figure4.png" alt="">
+        <p class="img-title">Figure 4: Interactions illustrate problematic inference patterns used by the LLM. Then, we construct adversarial prompts based on the interaction.</p>
+
+        <br>
+
+        <p>
+            For instance, as shown in Figure 4, the interaction between {Emily, plays} made significant contribution on the network output. However, its interaction effect primarily attributed to the foundational memorization effects (76%). Therefore, the LLM mistakenly encoded a strong prior that associated the output “piano” with interaction {Emily, plays}. We constructed an adversarial prompt by replacing “Emily” to “Joshua Bell” to attack the LLM. In the way, we observed the LLM outputting “violin” instead of “piano”.
+        </p>
+        
+
+    </div>
+
+
+</div>
+
+<footer>
+    &copy; 2024 DNN Research. All rights reserved.
+</footer>
+
+
+</body>
+
+</html>
